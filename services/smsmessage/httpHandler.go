@@ -1,6 +1,7 @@
 package smsmessage
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -11,6 +12,12 @@ import (
 	"messageapi.e-vrit.co.il/services/smsmessage/models"
 )
 
+func CheckModel(sms int) (bool, error) {
+	if sms > 1 {
+		return false, errors.New("SendingType not found")
+	}
+	return true, nil
+}
 func SendSms(ctx *gin.Context) {
 	fmt.Println("controller", ctx)
 	var sms models.SmsModel
