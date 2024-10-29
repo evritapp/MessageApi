@@ -9,17 +9,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/joho/godotenv"
 	"messageapi.e-vrit.co.il/services/smsmessage/models"
 )
 
 func NewFlashySmsModel() (*FlashySmsModel, error) {
 	fmt.Println("NewFlashySmsModel")
-	err := godotenv.Load(".env")
-	if err != nil {
-		// log.Fatalf("Error loading .env file")
-		return nil, err
-	}
 
 	return &FlashySmsModel{
 		FlashyUrl:    os.Getenv("FLASHY_URL"),
