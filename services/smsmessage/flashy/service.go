@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -18,7 +17,7 @@ func NewFlashySmsModel() (*FlashySmsModel, error) {
 	fmt.Println("NewFlashySmsModel")
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatalf("Error loading .env file")
+		// log.Fatalf("Error loading .env file")
 		return nil, err
 	}
 

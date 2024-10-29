@@ -14,10 +14,11 @@ import (
 
 func CheckModel(sms int) (bool, error) {
 	if sms > 1 {
-		return false, errors.New("SendingType not found")
+		return false, errors.New("SendingType not correct")
 	}
 	return true, nil
 }
+
 func SendSms(ctx *gin.Context) {
 	fmt.Println("controller", ctx)
 	var sms models.SmsModel
