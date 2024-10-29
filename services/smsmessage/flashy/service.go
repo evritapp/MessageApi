@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -36,16 +35,22 @@ func (flashySmsModel FlashySmsModel) SendSms(sms models.SmsModel) bool {
 		},
 	}
 
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		fmt.Printf("could not marshal json: %s\n", err)
+	var jsonData bytes.Buffer
+	if err := json.NewEncoder(&jsonData).Encode(data); err != nil {
+		fmt.Printf("could not encode json: %s\n", err)
 		return false
 	}
-	// strJsonData = fmt.Sprintf("%v", jsonData)
-	// client := &http.Client{}
-	// req, err := http.NewRequest(http.MethodPost, flashySmsModel.FlashyUrl, bytes.NewBuffer(data))
+	//Use Marshal
+	// jsonData, err := json.Marshal(data)
+	// if err != nil {
+	// 	fmt.Printf("could not marshal json: %s\n", err)
+	// 	return false
+	// }
+
+	// req, err := http.NewRequest(http.MethodPost, fullUrl, bytes.NewReader(jsonData))
+
 	fullUrl := flashySmsModel.FlashyUrl + flashySmsModel.SmsFlashyUrl
-	req, err := http.NewRequest(http.MethodPost, fullUrl, bytes.NewReader(jsonData))
+	req, err := http.NewRequest(http.MethodPost, fullUrl, &jsonData)
 
 	if err != nil {
 		fmt.Printf("client: could not create request: %s\n", err)
@@ -61,21 +66,28 @@ func (flashySmsModel FlashySmsModel) SendSms(sms models.SmsModel) bool {
 	}
 
 	resp, err := client.Do(req)
-	// res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		fmt.Printf("client: error making http request: %s\n", err)
 		os.Exit(1)
 		return false
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Printf("client: could not read response body: %s\n", err)
-		return false
-	}
 
+	//Use UnMarshal
+	// body, err := ioutil.ReadAll(resp.Body)
+	// if err != nil {
+	// 	fmt.Printf("client: could not read response body: %s\n", err)
+	// 	return false
+	// }
+	// var response map[string]interface{}
+	// if err := json.Unmarshal(body, &response); err != nil {
+	// 	fmt.Printf("client: could not parse response: %s\n", err)
+	// 	return false
+	// }
+
+	decoder := json.NewDecoder(resp.Body)
 	var response map[string]interface{}
-	if err := json.Unmarshal(body, &response); err != nil {
+	if err := decoder.Decode(&response); err != nil {
 		fmt.Printf("client: could not parse response: %s\n", err)
 		return false
 	}
