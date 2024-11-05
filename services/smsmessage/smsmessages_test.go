@@ -62,7 +62,7 @@ func TestSendSms(t *testing.T) {
 
 	var sms models.SmsModel // a == Student{"", 0}
 	sms.Message = "12345"
-	sms.ReciverPhoneNumber = "0587198145"
+	sms.ReciverPhoneNumber = "0548070766"
 	sms.SenderName = "e-vrit"
 	sms.SendingType = 1
 
