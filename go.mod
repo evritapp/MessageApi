@@ -1,6 +1,6 @@
 module messageapi.e-vrit.co.il
 
-go 1.23.0
+go 1.23
 
 require (
 	github.com/gin-gonic/gin v1.10.0
