@@ -25,8 +25,6 @@ func NewFlashySmsModel() (*FlashySmsModel, error) {
 
 func (flashySmsModel FlashySmsModel) SendSms(sms models.SmsModel) bool {
 
-	// dataStr:= fmt.Sprintf(`"message": {{"from": "%v", "to": "%v", "message": "%v"}}`, sms.SenderName, sms.ReciverPhoneNumber, sms.Message)
-	// data := []byte(dataStr)
 	data := map[string]interface{}{
 		"message": map[string]interface{}{
 			"from":    sms.SenderName,

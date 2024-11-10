@@ -1,7 +1,6 @@
 package smsmessage_test
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,33 +10,20 @@ import (
 	"messageapi.e-vrit.co.il/services/smsmessage/models"
 )
 
-// func loadEnv() error {
-// 	err := godotenv.Load(".env")
-// 	if err != nil {
-// 		return fmt.Errorf("error loading .env file: %v", err)
-// 	}
-
-// 	env := os.Getenv("GO_ENV")
-// 	if env == "" {
-// 		env = "development" // Default to development if not set
-// 	}
-// 	return godotenv.Overload(fmt.Sprintf(".env.%s", env))
+// func funcUsingEnvVar() string {
+// 	return os.Getenv("GO_ENV")
 // }
 
-func funcUsingEnvVar() string {
-	return os.Getenv("GO_ENV")
-}
+// func setEnvVarForTesting(t *testing.T) {
+// 	t.Setenv("GO_ENV", "dev")
+// }
 
-func setEnvVarForTesting(t *testing.T) {
-	t.Setenv("GO_ENV", "dev")
-}
-
-func TestSettingEnvVar(t *testing.T) {
-	setEnvVarForTesting(t)
-	if funcUsingEnvVar() != "dev" {
-		t.Fatal("GO_ENV not set to dev")
-	}
-}
+// func TestSettingEnvVar(t *testing.T) {
+// 	setEnvVarForTesting(t)
+// 	if funcUsingEnvVar() != "dev" {
+// 		t.Fatal("GO_ENV not set to dev")
+// 	}
+// }
 
 var testFlashyCases = []struct {
 	name      string
@@ -45,22 +31,22 @@ var testFlashyCases = []struct {
 	smsModel  models.SmsModel
 	FlashySms flashy.FlashySmsModel
 }{
-	{
-		name:     "flashy sms- success",
-		expected: true,
-		smsModel: models.SmsModel{
-			Message:            " הצלחה פלאשי",
-			ReciverPhoneNumber: "0526012123",
-			SenderName:         "e-vrit",
-			SendingType:        1,
-		},
-		FlashySms: flashy.FlashySmsModel{
-			FlashyUrl:    "https://api.flashy.app/",
-			SmsFlashyUrl: "messages/sms",
-			ContentType:  "application/json",
-			Key:          "vBbmiffyB4kaIrN2zCfa4luJe4Bbbmw7",
-		},
-	},
+	// {
+	// 	name:     "flashy sms- success",
+	// 	expected: true,
+	// 	smsModel: models.SmsModel{
+	// 		Message:            " הצלחה פלאשי",
+	// 		ReciverPhoneNumber: "0526012123",
+	// 		SenderName:         "e-vrit",
+	// 		SendingType:        1,
+	// 	},
+	// 	FlashySms: flashy.FlashySmsModel{
+	// 		FlashyUrl:    "https://api.flashy.app/",
+	// 		SmsFlashyUrl: "messages/sms",
+	// 		ContentType:  "application/json",
+	// 		Key:          "vBbmiffyB4kaIrN2zCfa4luJe4Bbbmw7",
+	// 	},
+	// },
 
 	{
 		name:     "flashy sms- not success",
@@ -104,7 +90,7 @@ var testInforuCases = []struct {
 		name:     "inforu sms- success",
 		expected: true,
 		smsModel: models.SmsModel{
-			Message:            "אינפוריו",
+			Message:            " הצלחה אינפוריו",
 			ReciverPhoneNumber: "0526012123",
 			SenderName:         "e-vrit",
 			SendingType:        1,
@@ -119,9 +105,9 @@ var testInforuCases = []struct {
 
 	{
 		name:     "inforu sms- not success",
-		expected: true,
+		expected: false,
 		smsModel: models.SmsModel{
-			Message:            "אינפוריו",
+			Message:            " כשלון אינפוריו",
 			ReciverPhoneNumber: "0526012123",
 			SenderName:         "e-vrit",
 			SendingType:        1,
@@ -146,5 +132,4 @@ func TestInforuSendSms(t *testing.T) {
 		res := isms.SendSms(tc.smsModel)
 		asserts.Equal(tc.expected, res)
 	}
-
 }

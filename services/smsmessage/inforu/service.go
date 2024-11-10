@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -45,14 +44,21 @@ func (inforuSmsModel InforuSmsModel) SendSms(sms models.SmsModel) bool {
 		},
 	}
 
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		fmt.Printf("could not marshal json: %s\n", err)
+	var jsonData bytes.Buffer
+	if err := json.NewEncoder(&jsonData).Encode(data); err != nil {
+		fmt.Printf("could not encode json: %s\n", err)
 		return false
 	}
+	//Use Marshal
+	// jsonData, err := json.Marshal(data)
+	// if err != nil {
+	// 	fmt.Printf("could not marshal json: %s\n", err)
+	// 	return false
+	// }
+	// req, err := http.NewRequest(http.MethodPost, fullUrl, bytes.NewReader(jsonData))
 
 	fullUrl := inforuSmsModel.InforuUrl + inforuSmsModel.SmsInforuUrl
-	req, err := http.NewRequest(http.MethodPost, fullUrl, bytes.NewReader(jsonData))
+	req, err := http.NewRequest(http.MethodPost, fullUrl, &jsonData)
 
 	if err != nil {
 		fmt.Printf("client: could not create request: %s\n", err)
@@ -74,28 +80,33 @@ func (inforuSmsModel InforuSmsModel) SendSms(sms models.SmsModel) bool {
 		return false
 	}
 	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Printf("client: could not read response body: %s\n", err)
-		return false
-	}
+	//Use UnMarshal
+	// body, err := io.ReadAll(resp.Body)
+	// if err != nil {
+	// 	fmt.Printf("client: could not read response body: %s\n", err)
+	// 	return false
+	// }
+	// var response map[string]interface{}
+	// if err := json.Unmarshal(body, &response); err != nil {
+	// 	fmt.Printf("client: could not parse response: %s\n", err)
+	// 	return false
+	// }
 
+	decoder := json.NewDecoder(resp.Body)
 	var response map[string]interface{}
-	if err := json.Unmarshal(body, &response); err != nil {
+	if err := decoder.Decode(&response); err != nil {
 		fmt.Printf("client: could not parse response: %s\n", err)
 		return false
 	}
 
-	if success, ok := response["success"].(bool); ok && success {
+	if success, ok := response["StatusId"].(float64); ok && success == 1 {
 		fmt.Println("Message sent successfully!")
 		return true
 	}
 
-	if errors, ok := response["errors"].(map[string]interface{}); ok {
+	if errorRes, ok := response["StatusId"].(float64); ok && errorRes == -1 {
 		fmt.Println("Failed to send message. Errors:")
-		for key, val := range errors {
-			fmt.Printf("%s: %v\n", key, val)
-		}
+		return false
 	}
 
 	return false
