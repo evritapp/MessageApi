@@ -1,12 +1,13 @@
 package smsmessage_test
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"messageapi.e-vrit.co.il/services/smsmessage"
 	"messageapi.e-vrit.co.il/services/smsmessage/flashy"
+	"messageapi.e-vrit.co.il/services/smsmessage/inforu"
 	"messageapi.e-vrit.co.il/services/smsmessage/models"
 )
 
@@ -38,50 +39,112 @@ func TestSettingEnvVar(t *testing.T) {
 	}
 }
 
-// func TestSmsModel(t *testing.T) {
+var testFlashyCases = []struct {
+	name      string
+	expected  bool
+	smsModel  models.SmsModel
+	FlashySms flashy.FlashySmsModel
+}{
+	{
+		name:     "flashy sms- success",
+		expected: true,
+		smsModel: models.SmsModel{
+			Message:            "פלאשי",
+			ReciverPhoneNumber: "0587198145",
+			SenderName:         "e-vrit",
+			SendingType:        1,
+		},
+		FlashySms: flashy.FlashySmsModel{
+			FlashyUrl:    "https://api.flashy.app/",
+			SmsFlashyUrl: "messages/sms",
+			ContentType:  "application/json",
+			Key:          "vBbmiffyB4kaIrN2zCfa4luJe4Bbbmw7",
+		},
+	},
 
-// 	isms, err := 1, errors.New("WRONG MESSAGE")
+	{
+		name:     "flashy sms- not success",
+		expected: true,
+		smsModel: models.SmsModel{
+			Message:            "פלאשי",
+			ReciverPhoneNumber: "0587198145",
+			SenderName:         "e-vrit",
+			SendingType:        1,
+		},
+		FlashySms: flashy.FlashySmsModel{
+			FlashyUrl:    "https://api.flashy.app/",
+			SmsFlashyUrl: "messages/sms",
+			ContentType:  "application/json",
+			Key:          "vBbmiffyB4kaIrN2zC555fa4khjkhkhkluJe4Bbbmw7",
+		},
+	},
+}
 
-// 	if err != nil && isms == 1 {
-// 		t.Error("test error", err)
-// 	}
-
-// }
-func TestSendSms(t *testing.T) {
-
-	// if err := TestSettingEnvVar(); err != nil {
-	// 	t.Errorf("Failed to load environment: %v", err)
-	// 	return
-	// }
-	// setEnvVarForTesting(t)
-
-	// if funcUsingEnvVar() != "dev" {
-	// 	t.Errorf("Failed to load environment: expected dev, got %v", funcUsingEnvVar())
-	// 	return
-	// }
-
-	var sms models.SmsModel // a == Student{"", 0}
-	sms.Message = "12345"
-	sms.ReciverPhoneNumber = "0587198145"
-	sms.SenderName = "e-vrit"
-	sms.SendingType = 1
+func TestFlashySendSms(t *testing.T) {
 
 	var isms smsmessage.ISms
+	for _, tc := range testFlashyCases {
 
-	var flashySms flashy.FlashySmsModel
-	flashySms.FlashyUrl = "https://api.flashy.app/"
-	flashySms.SmsFlashyUrl = "messages/sms"
-	flashySms.ContentType = "application/json"
-	flashySms.Key = "vBbmiffyB4kaIrN2zCfa4luJe4Bbbmw7"
-	//for getting error
-	// flashySms.Key = "12345"
-	flashySms.Data = []byte(`{"from": "Test User", "to": "test@example.com", "message": "test@example.com"}`)
+		asserts := assert.New(t)
+		isms = &tc.FlashySms
 
-	isms = &flashySms
-
-	res := isms.SendSms(sms)
-	if res == false {
-		t.Error("test error")
+		res := isms.SendSms(tc.smsModel)
+		asserts.Equal(tc.expected, res)
 	}
-	fmt.Println(isms)
+
+}
+
+var testInforuCases = []struct {
+	name      string
+	expected  bool
+	smsModel  models.SmsModel
+	InforuSms inforu.InforuSmsModel
+}{
+	{
+		name:     "inforu sms- success",
+		expected: true,
+		smsModel: models.SmsModel{
+			Message:            "אינפוריו",
+			ReciverPhoneNumber: "0587198145",
+			SenderName:         "e-vrit",
+			SendingType:        1,
+		},
+		InforuSms: inforu.InforuSmsModel{
+			InforuUrl:     "https://capi.inforu.co.il/api/v2/",
+			SmsInforuUrl:  "SMS/SendSms",
+			ContentType:   "application/json",
+			Authorization: "Basic WWFxdWllbDoxZDk3Zjc4Yi1jNTIzLTRjMDctOTU5Ni1jNjk4YzdiMzQ2YzU=",
+		},
+	},
+
+	{
+		name:     "inforu sms- not success",
+		expected: true,
+		smsModel: models.SmsModel{
+			Message:            "אינפוריו",
+			ReciverPhoneNumber: "0587198145",
+			SenderName:         "e-vrit",
+			SendingType:        1,
+		},
+		InforuSms: inforu.InforuSmsModel{
+			InforuUrl:     "https://capi.inforu.co.il/api/v2/",
+			SmsInforuUrl:  "SMS/SendSms",
+			ContentType:   "application/json",
+			Authorization: "Basic WWFxdWllbDoxZDk3Zjc4Yi1jdfgdgNTIzLTRjMDctOTU5Ni1jNjk4YzdiMzQ2YzU=",
+		},
+	},
+}
+
+func TestInforuSendSms(t *testing.T) {
+
+	var isms smsmessage.ISms
+	for _, tc := range testInforuCases {
+
+		asserts := assert.New(t)
+		isms = &tc.InforuSms
+
+		res := isms.SendSms(tc.smsModel)
+		asserts.Equal(tc.expected, res)
+	}
+
 }
