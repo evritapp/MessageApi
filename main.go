@@ -12,20 +12,8 @@ import (
 )
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
+	err := godotenv.Load()
 	env := os.Getenv("GO_ENV")
-	if env == "" {
-		env = "development" // Default to development if not set
-	}
-
-	 err2 := godotenv.Overload(fmt.Sprintf(".env.%s", env))
-	if err2 != nil {
-		log.Fatalf("Error loading .env.%s file", env)
-	}
-
 	// Initialize database connection
 	err = db.InitDB()
 	if err != nil {
@@ -35,7 +23,7 @@ func main() {
 	defer db.CloseDB()
 
 	// Set Gin mode based on environment
-	if env == "production" {
+	if env == "prod" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
