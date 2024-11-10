@@ -49,8 +49,8 @@ var testFlashyCases = []struct {
 		name:     "flashy sms- success",
 		expected: true,
 		smsModel: models.SmsModel{
-			Message:            "פלאשי",
-			ReciverPhoneNumber: "0587198145",
+			Message:            " הצלחה פלאשי",
+			ReciverPhoneNumber: "0526012123",
 			SenderName:         "e-vrit",
 			SendingType:        1,
 		},
@@ -64,10 +64,10 @@ var testFlashyCases = []struct {
 
 	{
 		name:     "flashy sms- not success",
-		expected: true,
+		expected: false,
 		smsModel: models.SmsModel{
-			Message:            "פלאשי",
-			ReciverPhoneNumber: "0587198145",
+			Message:            " כשלון פלאשי",
+			ReciverPhoneNumber: "0526012123",
 			SenderName:         "e-vrit",
 			SendingType:        1,
 		},
@@ -105,7 +105,7 @@ var testInforuCases = []struct {
 		expected: true,
 		smsModel: models.SmsModel{
 			Message:            "אינפוריו",
-			ReciverPhoneNumber: "0587198145",
+			ReciverPhoneNumber: "0526012123",
 			SenderName:         "e-vrit",
 			SendingType:        1,
 		},
@@ -122,7 +122,7 @@ var testInforuCases = []struct {
 		expected: true,
 		smsModel: models.SmsModel{
 			Message:            "אינפוריו",
-			ReciverPhoneNumber: "0587198145",
+			ReciverPhoneNumber: "0526012123",
 			SenderName:         "e-vrit",
 			SendingType:        1,
 		},
