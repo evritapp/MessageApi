@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"messageapi.e-vrit.co.il/db"
 	"messageapi.e-vrit.co.il/routes"
 )
 
@@ -23,12 +22,12 @@ func main() {
 	// env := os.Getenv("GO_ENV")
 
 	// Initialize database connection
-	err = db.InitDB()
+	// err = db.InitDB()
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("connected to db")
-	defer db.CloseDB()
+	// defer db.CloseDB()
 
 	// Set Gin mode based on environment
 	if env == "prod" {
@@ -47,5 +46,4 @@ func main() {
 	}
 	fmt.Printf("Server is running on port %s in %s mode\n", port, env)
 	router.Run(":" + port)
-
 }

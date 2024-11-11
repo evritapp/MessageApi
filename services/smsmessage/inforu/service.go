@@ -3,6 +3,7 @@ package inforu
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -30,7 +31,7 @@ func NewInforuSmsModel() (*InforuSmsModel, error) {
 	}, nil
 }
 
-func (inforuSmsModel InforuSmsModel) SendSms(sms models.SmsModel) bool {
+func (inforuSmsModel InforuSmsModel) SendSms(sms models.SmsModel) (bool, error) {
 
 	data := map[string]interface{}{
 		"Message": sms.Message,
@@ -47,7 +48,7 @@ func (inforuSmsModel InforuSmsModel) SendSms(sms models.SmsModel) bool {
 	var jsonData bytes.Buffer
 	if err := json.NewEncoder(&jsonData).Encode(data); err != nil {
 		fmt.Printf("could not encode json: %s\n", err)
-		return false
+		return false, err
 	}
 	//Use Marshal
 	// jsonData, err := json.Marshal(data)
@@ -63,7 +64,7 @@ func (inforuSmsModel InforuSmsModel) SendSms(sms models.SmsModel) bool {
 	if err != nil {
 		fmt.Printf("client: could not create request: %s\n", err)
 		os.Exit(1)
-		return false
+		return false, err
 	}
 
 	req.Header.Add("Content-Type", inforuSmsModel.ContentType)
@@ -77,7 +78,7 @@ func (inforuSmsModel InforuSmsModel) SendSms(sms models.SmsModel) bool {
 	if err != nil {
 		fmt.Printf("client: error making http request: %s\n", err)
 		os.Exit(1)
-		return false
+		return false, err
 	}
 	defer resp.Body.Close()
 	//Use UnMarshal
@@ -96,18 +97,18 @@ func (inforuSmsModel InforuSmsModel) SendSms(sms models.SmsModel) bool {
 	var response map[string]interface{}
 	if err := decoder.Decode(&response); err != nil {
 		fmt.Printf("client: could not parse response: %s\n", err)
-		return false
+		return false, err
 	}
 
 	if success, ok := response["StatusId"].(float64); ok && success == 1 {
 		fmt.Println("Message sent successfully!")
-		return true
+		return true, nil
 	}
 
 	if errorRes, ok := response["StatusId"].(float64); ok && errorRes == -1 {
 		fmt.Println("Failed to send message. Errors:")
-		return false
+		return false, err
 	}
 
-	return false
+	return false, errors.New("unknown exception")
 }

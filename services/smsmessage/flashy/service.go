@@ -3,6 +3,7 @@ package flashy
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -23,7 +24,7 @@ func NewFlashySmsModel() (*FlashySmsModel, error) {
 	}, nil
 }
 
-func (flashySmsModel FlashySmsModel) SendSms(sms models.SmsModel) bool {
+func (flashySmsModel FlashySmsModel) SendSms(sms models.SmsModel) (bool, error) {
 
 	data := map[string]interface{}{
 		"message": map[string]interface{}{
@@ -36,7 +37,7 @@ func (flashySmsModel FlashySmsModel) SendSms(sms models.SmsModel) bool {
 	var jsonData bytes.Buffer
 	if err := json.NewEncoder(&jsonData).Encode(data); err != nil {
 		fmt.Printf("could not encode json: %s\n", err)
-		return false
+		return false, err
 	}
 	//Use Marshal
 	// jsonData, err := json.Marshal(data)
@@ -53,7 +54,7 @@ func (flashySmsModel FlashySmsModel) SendSms(sms models.SmsModel) bool {
 	if err != nil {
 		fmt.Printf("client: could not create request: %s\n", err)
 		os.Exit(1)
-		return false
+		return false, err
 	}
 
 	req.Header.Add("Content-Type", flashySmsModel.ContentType)
@@ -67,7 +68,7 @@ func (flashySmsModel FlashySmsModel) SendSms(sms models.SmsModel) bool {
 	if err != nil {
 		fmt.Printf("client: error making http request: %s\n", err)
 		os.Exit(1)
-		return false
+		return false, err
 	}
 	defer resp.Body.Close()
 
@@ -87,12 +88,12 @@ func (flashySmsModel FlashySmsModel) SendSms(sms models.SmsModel) bool {
 	var response map[string]interface{}
 	if err := decoder.Decode(&response); err != nil {
 		fmt.Printf("client: could not parse response: %s\n", err)
-		return false
+		return false, err
 	}
 
 	if success, ok := response["success"].(bool); ok && success {
 		fmt.Println("Message sent successfully!")
-		return true
+		return true, nil
 	}
 
 	if errors, ok := response["errors"].(map[string]interface{}); ok {
@@ -102,5 +103,5 @@ func (flashySmsModel FlashySmsModel) SendSms(sms models.SmsModel) bool {
 		}
 	}
 
-	return false
+	return false, errors.New("unknown exception")
 }
