@@ -11,9 +11,17 @@ import (
 	"messageapi.e-vrit.co.il/routes"
 )
 
+var env string
+
 func main() {
-	err := godotenv.Load()
-	env := os.Getenv("GO_ENV")
+	fmt.Printf("runnin in version %v", env)
+
+	err := godotenv.Load(fmt.Sprintf(".env.%s", env))
+	if err != nil {
+		log.Fatalf("Error loading .env.%s file", env)
+	}
+	// env := os.Getenv("GO_ENV")
+
 	// Initialize database connection
 	err = db.InitDB()
 	if err != nil {
