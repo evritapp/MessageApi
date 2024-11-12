@@ -1,11 +1,36 @@
 
 trigger:
-- main
+- master
 
-pool:
-  vmImage: ubuntu-latest
+stages:
+  - stage: 'BuildTest'
+    displayName: 'Build and Test'
+    variables:
+      GOVERSION:'1.23.1'
+      CGO_ENABLED:'0'
+      GOOS:'windows'
+    jobs:
+      - job: BuildTestBackend
+      displayName: 'Build and Test Go Backend'
+      pool:
+        vmImage: windows-latest
+      steps:
+      - task: GoTool@0
+        inputs:
+          version: $(GOVERSION)
+        displayName: 'Install and select Go version $(GOVERSION)'
+      - script: |
+          go get -u github.com/jstemmer/go-junit-report 2>&1
+          go get -u github.com/axw/gocov/gocov 2>&1
+          go get -u github.com/AlekSi/gocov-xml 2>&1
 
-steps:
+
+        
+
+
+
+
+
 - task: CopyFiles@2
   inputs:
     Contents: '**'
@@ -16,9 +41,7 @@ steps:
     ArtifactName: 'drop'
     
 
-- task: GoTool@0
-  inputs:
-    version: '1.23.1'
+
 
 - task: Go@0
   inputs:
