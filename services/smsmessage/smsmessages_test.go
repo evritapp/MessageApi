@@ -10,24 +10,24 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/stretchr/testify/assert"
-	"messageapi.e-vrit.co.il/enums"
 	"messageapi.e-vrit.co.il/services/smsmessage"
 	"messageapi.e-vrit.co.il/services/smsmessage/flashy"
 	"messageapi.e-vrit.co.il/services/smsmessage/inforu"
 	"messageapi.e-vrit.co.il/services/smsmessage/models"
 )
 
-func TestSms(t *testing.T) {
-	var sendingTypes = [...]int{0, 1}
-	for sendingType := range sendingTypes {
-		switch sendingType {
-		case enums.Flashy:
-			TestFlashySendSms(t)
-		case enums.Inforu:
-			TestInforuSendSms(t)
-		}
-	}
-}
+// func TestSms(t *testing.T) {
+// 	fmt.Println("TestSms")
+// 	var sendingTypes = [...]int{0, 1}
+// 	for sendingType := range sendingTypes {
+// 		switch sendingType {
+// 		case enums.Flashy:
+// 			TestFlashySendSms(t)
+// 		case enums.Inforu:
+// 			TestInforuSendSms(t)
+// 		}
+// 	}
+// }
 
 var testFlashyCases = []struct {
 	name          string
@@ -92,7 +92,7 @@ var testFlashyCases = []struct {
 }
 
 func TestFlashySendSms(t *testing.T) {
-
+	// fmt.Println("TestFlashySendSms")
 	var isms smsmessage.ISms
 	envToken := GetToken()
 	for _, tc := range testFlashyCases {
@@ -173,7 +173,7 @@ var testInforuCases = []struct {
 }
 
 func TestInforuSendSms(t *testing.T) {
-
+	// fmt.Println("TestInforuSendSms")
 	var isms smsmessage.ISms
 	envToken := GetToken()
 	for _, tc := range testInforuCases {
