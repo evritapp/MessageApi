@@ -2,7 +2,6 @@ package smsmessage_test
 
 import (
 	"fmt"
-	"log"
 
 	"os"
 	"path/filepath"
@@ -23,11 +22,8 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	log.Println("Do stuff BEFORE the tests!")
 	envToken = GetToken()
 	exitVal := m.Run()
-	log.Println("Do stuff AFTER the tests!")
-
 	os.Exit(exitVal)
 }
 
