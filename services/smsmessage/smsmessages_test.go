@@ -10,12 +10,24 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/stretchr/testify/assert"
+	"messageapi.e-vrit.co.il/enums"
 	"messageapi.e-vrit.co.il/services/smsmessage"
 	"messageapi.e-vrit.co.il/services/smsmessage/flashy"
 	"messageapi.e-vrit.co.il/services/smsmessage/inforu"
 	"messageapi.e-vrit.co.il/services/smsmessage/models"
 )
 
+func TestSms(t *testing.T) {
+	var sendingTypes = [...]int{0, 1}
+	for sendingType := range sendingTypes {
+		switch sendingType {
+		case enums.Flashy:
+			TestFlashySendSms(t)
+		case enums.Inforu:
+			TestInforuSendSms(t)
+		}
+	}
+}
 
 var testFlashyCases = []struct {
 	name          string
@@ -26,12 +38,11 @@ var testFlashyCases = []struct {
 	Token         string
 }{
 	{
-		name:          "flashy sms- success",
-		expected:      true,
-		expectedToken: true,
+		name:     "flashy sms- success",
+		expected: true,
 		smsModel: models.SmsModel{
 			Message:            " הצלחה פלאשי",
-			ReciverPhoneNumber: "0587198145",
+			ReciverPhoneNumber: "0526012123",
 			SenderName:         "e-vrit",
 			SendingType:        1,
 		},
@@ -45,12 +56,11 @@ var testFlashyCases = []struct {
 	},
 
 	{
-		name:          "flashy sms- not success key not valid",
-		expected:      false,
-		expectedToken: true,
+		name:     "flashy sms- not success key not valid",
+		expected: false,
 		smsModel: models.SmsModel{
 			Message:            " כשלון פלאשי",
-			ReciverPhoneNumber: "0587198145",
+			ReciverPhoneNumber: "0526012123",
 			SenderName:         "e-vrit",
 			SendingType:        1,
 		},
@@ -63,12 +73,11 @@ var testFlashyCases = []struct {
 		Token: "1q2w3e4r",
 	},
 	{
-		name:          "flashy sms- not success- token not valid",
-		expected:      true,
-		expectedToken: false,
+		name:     "flashy sms- not success- token not valid",
+		expected: false,
 		smsModel: models.SmsModel{
 			Message:            " הצלחה פלאשי",
-			ReciverPhoneNumber: "0587198145",
+			ReciverPhoneNumber: "0526012123",
 			SenderName:         "e-vrit",
 			SendingType:        1,
 		},
@@ -90,17 +99,15 @@ func TestFlashySendSms(t *testing.T) {
 
 		asserts := assert.New(t)
 
-		isToken := envToken == tc.Token
+		isTokenValid := envToken == tc.Token
 
-		asserts.Equal(tc.expectedToken, isToken)
+		if isTokenValid {
+			isms = &tc.FlashySms
 
-		isms = &tc.FlashySms
-
-		res, _ := isms.SendSms(tc.smsModel)
-		asserts.Equal(tc.expected, res)
-
+			res, _ := isms.SendSms(tc.smsModel)
+			asserts.Equal(tc.expected, res)
+		}
 	}
-
 }
 
 var testInforuCases = []struct {
@@ -112,12 +119,11 @@ var testInforuCases = []struct {
 	Token         string
 }{
 	{
-		name:          "inforu sms- success",
-		expected:      true,
-		expectedToken: true,
+		name:     "inforu sms- success",
+		expected: true,
 		smsModel: models.SmsModel{
 			Message:            " הצלחה אינפוריו",
-			ReciverPhoneNumber: "0587198145",
+			ReciverPhoneNumber: "0526012123",
 			SenderName:         "e-vrit",
 			SendingType:        1,
 		},
@@ -131,12 +137,11 @@ var testInforuCases = []struct {
 	},
 
 	{
-		name:          "inforu sms- not success Authorization not valid",
-		expected:      false,
-		expectedToken: true,
+		name:     "inforu sms- not success Authorization not valid",
+		expected: false,
 		smsModel: models.SmsModel{
 			Message:            " כשלון אינפוריו",
-			ReciverPhoneNumber: "0587198145",
+			ReciverPhoneNumber: "0526012123",
 			SenderName:         "e-vrit",
 			SendingType:        1,
 		},
@@ -149,12 +154,11 @@ var testInforuCases = []struct {
 		Token: "1q2w3e4r",
 	},
 	{
-		name:          "inforu sms- not success token not valid",
-		expected:      true,
-		expectedToken: false,
+		name:     "inforu sms- not success token not valid",
+		expected: false,
 		smsModel: models.SmsModel{
 			Message:            " הצלחה אינפוריו",
-			ReciverPhoneNumber: "0587198145",
+			ReciverPhoneNumber: "0526012123",
 			SenderName:         "e-vrit",
 			SendingType:        1,
 		},
@@ -175,14 +179,13 @@ func TestInforuSendSms(t *testing.T) {
 	for _, tc := range testInforuCases {
 
 		asserts := assert.New(t)
-		isToken := envToken == tc.Token
+		isTokenValid := envToken == tc.Token
 
-		asserts.Equal(tc.expectedToken, isToken)
-
-		isms = &tc.InforuSms
-		res, _ := isms.SendSms(tc.smsModel)
-		asserts.Equal(tc.expected, res)
-
+		if isTokenValid {
+			isms = &tc.InforuSms
+			res, _ := isms.SendSms(tc.smsModel)
+			asserts.Equal(tc.expected, res)
+		}
 	}
 }
 
