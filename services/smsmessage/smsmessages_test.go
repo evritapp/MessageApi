@@ -2,6 +2,8 @@ package smsmessage_test
 
 import (
 	"fmt"
+	"log"
+
 	"os"
 	"path/filepath"
 
@@ -16,18 +18,18 @@ import (
 	"messageapi.e-vrit.co.il/services/smsmessage/models"
 )
 
-// func TestSms(t *testing.T) {
-// 	fmt.Println("TestSms")
-// 	var sendingTypes = [...]int{0, 1}
-// 	for sendingType := range sendingTypes {
-// 		switch sendingType {
-// 		case enums.Flashy:
-// 			TestFlashySendSms(t)
-// 		case enums.Inforu:
-// 			TestInforuSendSms(t)
-// 		}
-// 	}
-// }
+var (
+	envToken string
+)
+
+func TestMain(m *testing.M) {
+	log.Println("Do stuff BEFORE the tests!")
+	envToken = GetToken()
+	exitVal := m.Run()
+	log.Println("Do stuff AFTER the tests!")
+
+	os.Exit(exitVal)
+}
 
 var testFlashyCases = []struct {
 	name          string
@@ -68,7 +70,7 @@ var testFlashyCases = []struct {
 			FlashyUrl:    "https://api.flashy.app/",
 			SmsFlashyUrl: "messages/sms",
 			ContentType:  "application/json",
-			Key:          "vBbmiffyB4kaIrN2zC555fa4khjkhkhkluJe4Bbbmw7",
+			Key:          "vBbmiffyB4kaIrN2zC555fa4khhhhjkhkhkluJe4Bbbmw7",
 		},
 		Token: "1q2w3e4r",
 	},
@@ -85,7 +87,7 @@ var testFlashyCases = []struct {
 			FlashyUrl:    "https://api.flashy.app/",
 			SmsFlashyUrl: "messages/sms",
 			ContentType:  "application/json",
-			Key:          "vBbmiffyB4kaIrN2zCfa4luJe4Bbbmw7",
+			Key:          "vBbmiffyB4kaIrN2zCfa4lhhhuJe4Bbbmw7",
 		},
 		Token: "123456",
 	},
@@ -94,7 +96,7 @@ var testFlashyCases = []struct {
 func TestFlashySendSms(t *testing.T) {
 	// fmt.Println("TestFlashySendSms")
 	var isms smsmessage.ISms
-	envToken := GetToken()
+
 	for _, tc := range testFlashyCases {
 
 		asserts := assert.New(t)
@@ -149,7 +151,7 @@ var testInforuCases = []struct {
 			InforuUrl:     "https://capi.inforu.co.il/api/v2/",
 			SmsInforuUrl:  "SMS/SendSms",
 			ContentType:   "application/json",
-			Authorization: "Basic WWFxdWllbDoxZDk3Zjc4Yi1jdfgdgNTIzLTRjMDctOTU5Nli1jNjk4YzdiMzQ2YzU=",
+			Authorization: "Basic WWFxdWllbDoxZDk3Zjc4Yi1jdfgdgNTIzLTRjiiiMDctOTU5Nli1jNjk4YzdiMzQ2YzU=",
 		},
 		Token: "1q2w3e4r",
 	},
@@ -166,7 +168,7 @@ var testInforuCases = []struct {
 			InforuUrl:     "https://capi.inforu.co.il/api/v2/",
 			SmsInforuUrl:  "SMS/SendSms",
 			ContentType:   "application/json",
-			Authorization: "Basic WWFxdWllbDoxZDk3Zjc4Yi1jNTIzLTRjMDctOTU5Ni1jNjk4YzdiMzQ2YzU=",
+			Authorization: "Basic WWFxdWllbDoxZDk3Zjc4Yi1jNTIzLTRjMDctOTU5Ni1jiiiNjk4YzdiMzQ2YzU=",
 		},
 		Token: "21245454",
 	},
@@ -175,7 +177,6 @@ var testInforuCases = []struct {
 func TestInforuSendSms(t *testing.T) {
 	// fmt.Println("TestInforuSendSms")
 	var isms smsmessage.ISms
-	envToken := GetToken()
 	for _, tc := range testInforuCases {
 
 		asserts := assert.New(t)
@@ -205,3 +206,16 @@ func GetToken() string {
 	t := os.Getenv("TOKEN")
 	return t
 }
+
+// func TestSms(t *testing.T) {
+// 	fmt.Println("TestSms")
+// 	var sendingTypes = [...]int{0, 1}
+// 	for sendingType := range sendingTypes {
+// 		switch sendingType {
+// 		case enums.Flashy:
+// 			TestFlashySendSms(t)
+// 		case enums.Inforu:
+// 			TestInforuSendSms(t)
+// 		}
+// 	}
+// }
