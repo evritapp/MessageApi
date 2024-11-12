@@ -5,4 +5,5 @@ type SmsModel struct {
 	SenderName         string
 	Message            string
 	ReciverPhoneNumber string
+	Token              string
 }
