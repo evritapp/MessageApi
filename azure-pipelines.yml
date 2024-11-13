@@ -1,5 +1,5 @@
   trigger: 
-  - qa
+  - dev
   pool:
     vmImage: 'ubuntu-latest'
 
@@ -23,7 +23,8 @@
     displayName: 'run build -tags stage' 
     inputs:
       command: 'build'
-      arguments: '-tags stage'
+
+      arguments: ''
       workingDirectory: '$(System.DefaultWorkingDirectory)'
   - task: CopyFiles@2
     inputs:
@@ -32,4 +33,4 @@
   - task: PublishBuildArtifacts@1
     inputs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      ArtifactName: 'drop'
+      ArtifactName: 'dev'
