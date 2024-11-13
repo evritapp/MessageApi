@@ -44,6 +44,9 @@ func main() {
 	if port == "" {
 		port = "8080" // Default port if not specified
 	}
+	if os.Getenv("ASPNETCORE_PORT") != "" { // get enviroment variable that set by ACNM
+		port = os.Getenv("ASPNETCORE_PORT")
+	}
 	fmt.Printf("Server is running on port %s in %s mode\n", port, env)
 	router.Run(":" + port)
 }

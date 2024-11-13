@@ -1,36 +1,35 @@
-trigger: 
- - main
+  trigger: 
+  - qa
+  pool:
+    vmImage: 'ubuntu-latest'
 
-pool:
-   vmImage: 'ubuntu-latest'
-
-steps: 
-- task: GoTool@0
-  inputs:
-    version: '1.23.1'
-- task: Go@0
-  inputs:
-    command: 'get'
-    arguments: '-d'
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
-- task: Go@0
-  enabled: false
-  displayName: 'run test -v' 
-  inputs:
-    command: 'test'
-    arguments: '-v ./...'
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
-- task: Go@0
-  displayName: 'run build -tags qa' 
-  inputs:
-    command: 'build'
-    arguments: '-tags qa'
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
-- task: CopyFiles@2
-  inputs:
-    Contents: '**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
+  steps: 
+  - task: GoTool@0
+    inputs:
+      version: '1.23.1'
+  - task: Go@0
+    inputs:
+      command: 'get'
+      arguments: '-d'
+      workingDirectory: '$(System.DefaultWorkingDirectory)'
+  - task: Go@0
+    enabled: false
+    displayName: 'run test -v' 
+    inputs:
+      command: 'test'
+      arguments: '-v ./...'
+      workingDirectory: '$(System.DefaultWorkingDirectory)'
+  - task: Go@0
+    displayName: 'run build -tags stage' 
+    inputs:
+      command: 'build'
+      arguments: '-tags stage'
+      workingDirectory: '$(System.DefaultWorkingDirectory)'
+  - task: CopyFiles@2
+    inputs:
+      Contents: '**'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
