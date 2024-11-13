@@ -28,7 +28,7 @@
       workingDirectory: '$(System.DefaultWorkingDirectory)'
   - task: CopyFiles@2
     inputs:
-      Contents: '**'
+      Contents: 'messageapi.e-vrit.co.il.exe'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
   - task: PublishBuildArtifacts@1
     inputs:
