@@ -20,7 +20,7 @@
       arguments: '-v ./...'
       workingDirectory: '$(System.DefaultWorkingDirectory)'
   - task: Go@0
-    displayName: 'run build -tags stage' 
+    displayName: 'run build -tags dev' 
     inputs:
       command: 'build'
 
