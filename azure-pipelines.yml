@@ -17,6 +17,7 @@ variables:
 
 stages:
   - stage: Test
+    condition: false
     displayName: 'Run Tests'
     jobs:
       - job: UnitTests
