@@ -16,7 +16,7 @@ var env string
 func main() {
 	fmt.Printf("runnin in version %v", env)
 
-	err := godotenv.Load(fmt.Sprintf(".env.%s", env))
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf("Error loading .env.%s file", env)
 	}

@@ -1,6 +1,6 @@
 *.exe
 
 *.env
-*.env.prod
-*.env.qa
-*.env.stage
+.env*
+.env.qa
+.env.stage
