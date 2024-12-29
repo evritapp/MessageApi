@@ -5,22 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/joho/godotenv"
 	"messageapi.e-vrit.co.il/services/smsmessage/models"
 )
 
 func NewInforuSmsModel() (*InforuSmsModel, error) {
 	fmt.Println("NewInforuSmsModel")
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-		return nil, err
-	}
 
 	return &InforuSmsModel{
 		InforuUrl:     os.Getenv("INFORU_URL"),

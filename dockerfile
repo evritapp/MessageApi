@@ -11,7 +11,7 @@ COPY . .
 RUN go get
  
 # Builds your app with optional configuration
-RUN go build -tags qa -o /messageapi
+RUN go build -o /messageapi
  
 # Tells Docker which network port your container listens on
 EXPOSE 9092
