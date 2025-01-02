@@ -58,7 +58,7 @@ jobs:
         id: tag_docker_image
         if: (steps.build_docker_image.outcome == 'success')
         run: |
-          docker tag ${{env.REPO_NAME}}:${{ env.TAG_VERSION }} ${{ secrets.ECR_REPO_ADDRESS }}:${{ env.TAG_VERSION }}
+          docker tag ${{secrets.REPO_NAME}}:${{ env.TAG_VERSION }} ${{ secrets.ECR_REPO_ADDRESS }}:${{ env.TAG_VERSION }}
 
       - name: Push Docker Image
         id: push_docker_image
@@ -70,7 +70,7 @@ jobs:
         id: update_task_definition
         if: (steps.push_docker_image.outcome == 'success')
         run: |
-          aws ecs describe-task-definition --task-definition $${{secrets.TASK_DEFINITION_NAME}} --query taskDefinition > task-definition.json
+          aws ecs describe-task-definition --task-definition ${{secrets.TASK_DEFINITION_NAME}} --query taskDefinition > task-definition.json
 
       - name: Evaluate TAG_VERSION Variable
         id: evaluate_tag_version
@@ -88,9 +88,9 @@ jobs:
 
       - name: Deploy to Amazon ECS
         id: deploy_to_ecs
-        if: (steps.render-cellcomunity-api-prod-container.outcome == 'success')
+        if: (steps.render_ecs_td.outcome == 'success')
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ steps.render-cellcomunity-api-prod-container.outputs.task-definition }}
-          service: evrit-messages-api-srv-dev
-          cluster: evrit-be-dev
+          task-definition: ${{ steps.render_ecs_td.outputs.task-definition }}
+          service: ${{ secrets.ECS_SERVICE }}
+          cluster: ${{ secrets.ECS_CLUSTER }}
