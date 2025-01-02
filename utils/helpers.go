@@ -16,7 +16,7 @@ func CheckModel(sms int) (bool, error) {
 func InitEnvVars() error {
 	err := godotenv.Load()
 	if err != nil {
-		fmt.Printf("Error loading .env file", err)
+		fmt.Println("Error loading .env file", err)
 		return err
 	}
 	return nil

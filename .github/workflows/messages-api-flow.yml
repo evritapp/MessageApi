@@ -1,0 +1,96 @@
+name: Evrit Messages Api Flow
+on:
+  pull_request:
+    types:
+      - closed
+      - opened
+      - synchronize
+    branches:
+      - develop
+
+env:
+  MERGE_AND_DEPLOY_DEVELOP: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged && github.event.pull_request.base.ref == 'develop' }}
+  TAG_VERSION: ${GITHUB_SHA::7}
+
+jobs:
+  pr_actions_and_deploy:
+    name: PR Actions and Deploy
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23.1'
+
+      - name: Install dependencies
+        run: go get -d -v ./...
+
+      - name: Audit
+        run: make audit
+
+      - name: Build
+        id: build
+        run: go build -v main.go
+
+      - name: Authenticate For deploy
+        id: auth
+        if: (steps.build.outcome == 'success' && (env.MERGE_AND_DEPLOY_DEVELOP == 'true' || env.MERGE_AND_DEPLOY_MAIN == 'true'))
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: ECR Login
+        id: ecr_login
+        if: (steps.auth.outcome == 'success')
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO_ADDRESS }}
+
+      - name: Build Docker Image
+        id: build_docker_image
+        if: (steps.ecr_login.outcome == 'success')
+        run: |
+          docker build --build-arg VERSION=${{ env.TAG_VERSION }} -t ${{secrets.REPO_NAME}}:${{ env.TAG_VERSION }} .
+
+      - name: Tag Docker Image
+        id: tag_docker_image
+        if: (steps.build_docker_image.outcome == 'success')
+        run: |
+          docker tag ${{env.REPO_NAME}}:${{ env.TAG_VERSION }} ${{ secrets.ECR_REPO_ADDRESS }}:${{ env.TAG_VERSION }}
+
+      - name: Push Docker Image
+        id: push_docker_image
+        if: (steps.tag_docker_image.outcome == 'success')
+        run: |
+          docker push ${{ secrets.ECR_REPO_ADDRESS }}:${{ env.TAG_VERSION }}
+
+      - name: Update Task definition
+        id: update_task_definition
+        if: (steps.push_docker_image.outcome == 'success')
+        run: |
+          aws ecs describe-task-definition --task-definition $${{secrets.TASK_DEFINITION_NAME}} --query taskDefinition > task-definition.json
+
+      - name: Evaluate TAG_VERSION Variable
+        id: evaluate_tag_version
+        if: (steps.update_task_definition.outcome == 'success')
+        run: echo "TD_STEP_TAG_VERSION=${GITHUB_SHA:0:7}" >> $GITHUB_ENV
+
+      - name: Render Amazon ECS task definition
+        id: render_ecs_td
+        if: (steps.evaluate_tag_version.outcome == 'success')
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: messages-api
+          image: ${{ secrets.ECR_REPO_ADDRESS }}:${{ env.TD_STEP_TAG_VERSION }}
+
+      - name: Deploy to Amazon ECS
+        id: deploy_to_ecs
+        if: (steps.render-cellcomunity-api-prod-container.outcome == 'success')
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.render-cellcomunity-api-prod-container.outputs.task-definition }}
+          service: evrit-messages-api-srv-dev
+          cluster: evrit-be-dev
