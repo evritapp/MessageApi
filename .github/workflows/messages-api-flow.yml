@@ -9,7 +9,7 @@ on:
       - develop
 
 env:
-  MERGE_AND_DEPLOY_DEVELOP: ${{ contains(github.event.pull_request.title, '--deploy') && github.event_name == 'pull_request' && github.event.pull_request.merged && github.event.pull_request.base.ref == 'develop' }}
+  MERGE_AND_DEPLOY_DEVELOP: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged && github.event.pull_request.base.ref == 'develop' }}
   TAG_VERSION: ${GITHUB_SHA::7}
 
 jobs:
