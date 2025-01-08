@@ -30,7 +30,7 @@ func SendSms(ctx *gin.Context) {
 
 	token := os.Getenv("TOKEN")
 	tokenReq := ctx.Request.Header["Token"][0]
-	if bcrypt.CompareHashAndPassword([]byte(tokenReq), []byte(token)) != nil || err != nil {
+	if bcrypt.CompareHashAndPassword([]byte(tokenReq), []byte(token)) != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "token not valid"})
 		return
 	}
