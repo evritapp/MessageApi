@@ -97,7 +97,7 @@ jobs:
       - name: Deploy to Amazon ECS - DEVELOP
         id: deploy_to_ecs_develop
         if: (steps.render_ecs_td.outcome == 'success')
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.render_ecs_td.outputs.task-definition }}
           service: ${{ secrets.ECS_SERVICE_DEVELOP }}
@@ -106,7 +106,7 @@ jobs:
       - name: Deploy to Amazon ECS - MAIN
         id: deploy_to_ecs_main
         if: (steps.render_ecs_td.outcome == 'success')
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.render_ecs_td.outputs.task-definition }}
           service: ${{ secrets.ECS_SERVICE_MAIN }}
