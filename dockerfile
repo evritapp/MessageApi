@@ -1,4 +1,4 @@
-FROM golang:1.23.1-alpine AS builder
+FROM --platform=linux/amd64 golang:1.23.1-alpine AS builder
 
 
 # Creates an app directory to hold your app’s source code
@@ -11,7 +11,7 @@ COPY . .
 RUN go get
  
 # Builds your app with optional configuration
-RUN go build -tags qa -o /messageapi
+RUN go build -o /messageapi
  
 # Tells Docker which network port your container listens on
 EXPOSE 9092

@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 	"messageapi.e-vrit.co.il/enums"
 	"messageapi.e-vrit.co.il/services/smsmessage/flashy"
 	"messageapi.e-vrit.co.il/services/smsmessage/inforu"
@@ -29,7 +30,7 @@ func SendSms(ctx *gin.Context) {
 
 	token := os.Getenv("TOKEN")
 	tokenReq := ctx.Request.Header["Token"][0]
-	if token != tokenReq {
+	if bcrypt.CompareHashAndPassword([]byte(tokenReq), []byte(token)) != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "token not valid"})
 		return
 	}

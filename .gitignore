@@ -1,6 +1,6 @@
 *.exe
 
 *.env
-.env*
-.env.qa
+.env
 .env.stage
+.idea/
