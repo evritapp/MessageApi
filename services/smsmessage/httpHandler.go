@@ -28,7 +28,7 @@ func SendSms(ctx *gin.Context) {
 	}
 
 	token := os.Getenv("TOKEN")
-	tokenReq := ctx.Request.Header["Token"][0]
+	tokenReq := ctx.Request.Header.Get("Token")
 	if token != tokenReq {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "token not valid"})
 		return
