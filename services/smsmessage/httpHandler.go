@@ -19,41 +19,61 @@ func SendSms(ctx *gin.Context) {
 		return
 	}
 
-	var isms ISms
-	var err, errSms error
-
-	if sms.SendingType > 1 {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "sending type is not exists"})
-		return
-	}
-
 	token := os.Getenv("TOKEN")
-	tokenReq := ctx.Request.Header.Get("Token")
-	if token != tokenReq {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "token not valid"})
+	tokenReq := ctx.GetHeader("Token")
+	if token == "" || tokenReq == "" || token != tokenReq {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "token not valid"})
 		return
 	}
 
-	switch sms.SendingType {
-	case enums.Flashy:
-		isms, err = flashy.NewFlashySmsModel()
+	channel := ctx.DefaultQuery("channel", "sms")
+
+	var isms ISms
+	var err error
+
+	switch channel {
+	case "sms":
+		switch sms.SendingType {
+		case enums.Inforu:
+			isms, err = inforu.NewInforuModel()
+		case enums.Flashy:
+			isms, err = flashy.NewFlashySmsModel()
+		default:
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "sending type does not exist"})
+			return
+		}
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		_, errSms = isms.SendSms(sms)
+		_, errSms := isms.SendSms(sms)
+		if errSms != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": errSms.Error()})
+			return
+		}
 
-	case enums.Inforu:
-		isms, err = inforu.NewInforuSmsModel()
+	case "whatsapp":
+		if sms.SendingType != enums.Inforu {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "WhatsApp is only supported via InfoRU"})
+			return
+		}
+		if sms.TemplateId == 0 {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "TemplateId is required for WhatsApp"})
+			return
+		}
+		isms, err = inforu.NewInforuModel()
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		_, errSms = isms.SendSms(sms)
-	}
+		_, errSms := isms.SendWhatsApp(sms)
+		if errSms != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": errSms.Error()})
+			return
+		}
 
-	if errSms != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": errSms.Error()})
+	default:
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid channel, use 'sms' or 'whatsapp'"})
 		return
 	}
 }
