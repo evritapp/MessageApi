@@ -113,7 +113,7 @@ var testInforuCases = []struct {
 	expected      bool
 	expectedToken bool
 	smsModel      models.SmsModel
-	InforuSms     inforu.InforuSmsModel
+	InforuSms     inforu.InforuModel
 	Token         string
 }{
 	{
@@ -125,9 +125,8 @@ var testInforuCases = []struct {
 			SenderName:         "e-vrit",
 			SendingType:        1,
 		},
-		InforuSms: inforu.InforuSmsModel{
+		InforuSms: inforu.InforuModel{
 			InforuUrl:     "https://capi.inforu.co.il/api/v2/",
-			SmsInforuUrl:  "SMS/SendSms",
 			ContentType:   "application/json",
 			Authorization: "Basic WWFxdWllbDoxZDk3Zjc4Yi1jNTIzLTRjMDctOTU5Ni1jNjk4YzdiMzQ2YzU=",
 		},
@@ -143,9 +142,8 @@ var testInforuCases = []struct {
 			SenderName:         "e-vrit",
 			SendingType:        1,
 		},
-		InforuSms: inforu.InforuSmsModel{
+		InforuSms: inforu.InforuModel{
 			InforuUrl:     "https://capi.inforu.co.il/api/v2/",
-			SmsInforuUrl:  "SMS/SendSms",
 			ContentType:   "application/json",
 			Authorization: "Basic WWFxdWllbDoxZDk3Zjc4Yi1jdfgdgNTIzLTRjiiiMDctOTU5Nli1jNjk4YzdiMzQ2YzU=",
 		},
@@ -160,9 +158,8 @@ var testInforuCases = []struct {
 			SenderName:         "e-vrit",
 			SendingType:        1,
 		},
-		InforuSms: inforu.InforuSmsModel{
+		InforuSms: inforu.InforuModel{
 			InforuUrl:     "https://capi.inforu.co.il/api/v2/",
-			SmsInforuUrl:  "SMS/SendSms",
 			ContentType:   "application/json",
 			Authorization: "Basic WWFxdWllbDoxZDk3Zjc4Yi1jNTIzLTRjMDctOTU5Ni1jiiiNjk4YzdiMzQ2YzU=",
 		},

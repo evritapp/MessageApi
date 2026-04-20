@@ -1,9 +1,20 @@
 package models
 
+type TemplateParameter struct {
+	Name  string `json:"Name"`
+	Type  string `json:"Type"`
+	Value string `json:"Value"`
+}
+
 type SmsModel struct {
-	SendingType        int
-	SenderName         string
-	Message            string
-	ReciverPhoneNumber string
-	Token              string
+	SendingType        int    `json:"SendingType"`
+	SenderName         string `json:"SenderName"`
+	Message            string `json:"Message"`
+	ReciverPhoneNumber string `json:"ReciverPhoneNumber"`
+	Token              string `json:"Token"`
+
+	// WhatsApp-specific fields
+	TemplateId            int                 `json:"TemplateId,omitempty"`
+	TemplateParameters    []TemplateParameter `json:"TemplateParameters,omitempty"`
+	RecipientCustomFields map[string]string   `json:"RecipientCustomFields,omitempty"`
 }
