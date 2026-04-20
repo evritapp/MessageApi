@@ -94,6 +94,7 @@ func (m InforuModel) sendRequest(pathUrl string, data map[string]interface{}) (b
 	var response map[string]interface{}
 	if err := decoder.Decode(&response); err != nil {
 		fmt.Printf("client: could not parse response: %s\n", err)
+
 		return false, err
 	}
 
