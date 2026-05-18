@@ -17,7 +17,7 @@ env:
 jobs:
   pr_actions_and_deploy:
     name: PR Actions and Deploy
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go
