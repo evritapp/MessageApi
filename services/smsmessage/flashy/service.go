@@ -105,3 +105,7 @@ func (flashySmsModel FlashySmsModel) SendSms(sms models.SmsModel) (bool, error) 
 
 	return false, errors.New("unknown exception")
 }
+
+func (flashySmsModel FlashySmsModel) SendWhatsApp(sms models.SmsModel) (bool, error) {
+	return false, errors.New("WhatsApp is not supported via Flashy")
+}
