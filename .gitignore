@@ -4,3 +4,5 @@
 .env
 .env.stage
 .idea/
+.env.prod
+.env.qa
