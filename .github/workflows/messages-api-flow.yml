@@ -7,9 +7,11 @@ on:
       - synchronize
     branches:
       - develop
+      - main
 
 env:
   MERGE_AND_DEPLOY_DEVELOP: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged && github.event.pull_request.base.ref == 'develop' }}
+  MERGE_AND_DEPLOY_MAIN: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged && github.event.pull_request.base.ref == 'main' }}
   TAG_VERSION: ${GITHUB_SHA::7}
 
 jobs:
