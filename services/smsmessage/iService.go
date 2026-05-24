@@ -4,4 +4,5 @@ import "messageapi.e-vrit.co.il/services/smsmessage/models"
 
 type ISms interface {
 	SendSms(models.SmsModel) (bool, error)
+	SendWhatsApp(models.SmsModel) (bool, error)
 }
