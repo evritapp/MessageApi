@@ -2,19 +2,32 @@ package main
 
 import (
 	"fmt"
-	"net/http"
+	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"messageapi.e-vrit.co.il/routes"
-	"messageapi.e-vrit.co.il/utils"
 )
 
 var env string
 
 func main() {
+	fmt.Printf("runnin in version %v", env)
 
-	utils.InitEnvVars()
+	err := godotenv.Load(fmt.Sprintf(".env.%s", env))
+	if err != nil {
+		log.Fatalf("Error loading .env.%s file", env)
+	}
+	// env := os.Getenv("GO_ENV")
+
+	// Initialize database connection
+	// err = db.InitDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("connected to db")
+	// defer db.CloseDB()
 
 	// Set Gin mode based on environment
 	if env == "prod" {
@@ -26,18 +39,14 @@ func main() {
 
 	// Define routes
 	routes.SmsRoutes(router)
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"message": "ping pong"})
-	})
 	// Start server
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "9092" // Default port if not specified
+		port = "8080" // Default port if not specified
 	}
-
+	if os.Getenv("ASPNETCORE_PORT") != "" { // get enviroment variable that set by ACNM
+		port = os.Getenv("ASPNETCORE_PORT")
+	}
 	fmt.Printf("Server is running on port %s in %s mode\n", port, env)
-	err := router.Run(":" + port)
-	if err != nil {
-		return
-	}
+	router.Run(":" + port)
 }

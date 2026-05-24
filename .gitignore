@@ -1,8 +1,23 @@
+# Binaries
 *.exe
+*.test
+*.out
 
-*.env
+# Environment files (contain secrets)
 .env
-.env.stage
+.env.*
+!.env.example
+
+# Editor / OS
+.vscode/
 .idea/
-.env.prod
-.env.qa
+*.swp
+.DS_Store
+Thumbs.db
+
+# Go coverage / profiling
+coverage.out
+*.prof
+
+# Local logs
+*.log
