@@ -10,4 +10,4 @@ FROM gcr.io/distroless/static-debian12
 
 WORKDIR /app
 COPY --from=builder /build/messageapi ./messageapi
-CMD [ "/messageapi" ]
+CMD [ "/app/messageapi" ]
