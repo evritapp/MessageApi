@@ -13,11 +13,16 @@ import (
 var env string
 
 func main() {
+	env = os.Getenv("GO_ENV")
+	if env == "" {
+		env = "prod"
+	}
+
 	fmt.Printf("runnin in version %v", env)
 
 	err := godotenv.Load(fmt.Sprintf(".env.%s", env))
 	if err != nil {
-		log.Fatalf("Error loading .env.%s file", env)
+		log.Printf("Warning: could not load .env.%s: %v", env, err)
 	}
 	// env := os.Getenv("GO_ENV")
 
