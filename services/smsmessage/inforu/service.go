@@ -48,15 +48,40 @@ func (m InforuModel) SendWhatsApp(sms models.SmsModel) (bool, error) {
 		recipient[k] = v
 	}
 
-	data := map[string]interface{}{
+	requestData := map[string]interface{}{
 		"TemplateId": sms.TemplateId,
 		"Recipients": []map[string]interface{}{recipient},
 	}
 
 	if sms.TemplateParameters != nil {
-		data["TemplateParameters"] = sms.TemplateParameters
+		requestData["TemplateParameters"] = sms.TemplateParameters
 	} else {
-		data["TemplateParameters"] = []models.TemplateParameter{}
+		requestData["TemplateParameters"] = []models.TemplateParameter{}
+	}
+
+	if len(sms.Buttons) > 0 {
+		buttons := make([]map[string]interface{}, 0, len(sms.Buttons))
+		for _, b := range sms.Buttons {
+			value := b.Value
+			if value == "" {
+				value = b.Payload
+			}
+			if value == "" {
+				value = b.PayloadAlt
+			}
+
+			buttons = append(buttons, map[string]interface{}{
+				"ButtonIndex": b.ButtonIndex,
+				"FieldSource": b.FieldSource,
+				"FieldName":   b.FieldName,
+				"Value":       value,
+			})
+		}
+		requestData["Buttons"] = buttons
+	}
+
+	data := map[string]interface{}{
+		"Data": requestData,
 	}
 
 	return m.sendRequest("WhatsApp/SendWhatsApp", data)
