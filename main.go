@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -25,9 +24,7 @@ func main() {
 
 	// Define routes
 	routes.SmsRoutes(router)
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"message": "ping pong"})
-	})
+
 	// Start server
 	port := os.Getenv("PORT")
 	if port == "" {
