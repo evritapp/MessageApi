@@ -7,9 +7,11 @@ on:
       - synchronize
     branches:
       - develop
+      - main
 
 env:
   MERGE_AND_DEPLOY_DEVELOP: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged && github.event.pull_request.base.ref == 'develop' }}
+  MERGE_AND_DEPLOY_MAIN: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged && github.event.pull_request.base.ref == 'main' }}
   TAG_VERSION: ${GITHUB_SHA::7}
 
 jobs:
@@ -65,17 +67,23 @@ jobs:
         if: (steps.tag_docker_image.outcome == 'success')
         run: |
           docker push ${{ secrets.ECR_REPO_ADDRESS }}:${{ env.TAG_VERSION }}
-
-      - name: Update Task definition
-        id: update_task_definition
-        if: (steps.push_docker_image.outcome == 'success')
-        run: |
-          aws ecs describe-task-definition --task-definition ${{secrets.TASK_DEFINITION_NAME}} --query taskDefinition > task-definition.json
-
+          
       - name: Evaluate TAG_VERSION Variable
         id: evaluate_tag_version
-        if: (steps.update_task_definition.outcome == 'success')
+        if: (steps.push_docker_image.outcome == 'success')
         run: echo "TD_STEP_TAG_VERSION=${GITHUB_SHA:0:7}" >> $GITHUB_ENV
+
+      - name: Update Task definition - DEVELOP
+        id: update_task_definition_develop
+        if: (steps.evaluate_tag_version.outcome == 'success' && env.MERGE_AND_DEPLOY_DEVELOP == 'true')
+        run: |
+          aws ecs describe-task-definition --task-definition ${{secrets.TASK_DEFINITION_NAME_DEVELOP}} --query taskDefinition > task-definition.json
+
+      - name: Update Task definition - MAIN
+        id: update_task_definition_main
+        if: (steps.evaluate_tag_version.outcome == 'success' && env.MERGE_AND_DEPLOY_MAIN == 'true')
+        run: |
+          aws ecs describe-task-definition --task-definition ${{secrets.TASK_DEFINITION_NAME_MAIN}} --query taskDefinition > task-definition.json
 
       - name: Render Amazon ECS task definition
         id: render_ecs_td
@@ -86,11 +94,20 @@ jobs:
           container-name: messages-api
           image: ${{ secrets.ECR_REPO_ADDRESS }}:${{ env.TD_STEP_TAG_VERSION }}
 
-      - name: Deploy to Amazon ECS
-        id: deploy_to_ecs
-        if: (steps.render_ecs_td.outcome == 'success')
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      - name: Deploy to Amazon ECS - DEVELOP
+        id: deploy_to_ecs_develop
+        if: (steps.render_ecs_td.outcome == 'success' && env.MERGE_AND_DEPLOY_DEVELOP == 'true')
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.render_ecs_td.outputs.task-definition }}
-          service: ${{ secrets.ECS_SERVICE }}
-          cluster: ${{ secrets.ECS_CLUSTER }}
+          service: ${{ secrets.ECS_SERVICE_DEVELOP }}
+          cluster: ${{ secrets.ECS_CLUSTER_DEVELOP }}
+
+      - name: Deploy to Amazon ECS - MAIN
+        id: deploy_to_ecs_main
+        if: (steps.render_ecs_td.outcome == 'success' && env.MERGE_AND_DEPLOY_MAIN == 'true')
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render_ecs_td.outputs.task-definition }}
+          service: ${{ secrets.ECS_SERVICE_MAIN }}
+          cluster: ${{ secrets.ECS_CLUSTER_MAIN }}
